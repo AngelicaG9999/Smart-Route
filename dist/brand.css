@@ -1,0 +1,9 @@
+.brand{display:flex;justify-content:center;align-items:center;background:#000;flex-shrink:0;border-radius:10px;overflow:visible}
+.brand img{display:block;width:144px;height:auto;max-width:100%;max-height:none;object-fit:contain;aspect-ratio:448/282}
+.appbar{height:112px;background:#000;gap:12px}
+.login{padding-top:18px}
+.login>.brand{width:100%;margin:0 0 20px;font-size:inherit;letter-spacing:normal}
+.login>.brand img{width:300px;max-width:100%;height:auto}
+#dialog-content .brand{margin:0 0 20px;width:100%}
+#dialog-content .brand img{width:240px;max-width:100%;height:auto}
+main:not(.login){min-height:calc(100dvh - 228px)}

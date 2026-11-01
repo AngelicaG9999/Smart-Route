@@ -1,0 +1,34 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const nodes = new Map();
+const node = key => {
+  if (!nodes.has(key)) nodes.set(key, { innerHTML: '', textContent: '', style: {}, hidden: true, disabled: true, classList: { add() {}, remove() {} }, querySelector: () => node(key + ' child'), showModal() {}, close() {} });
+  return nodes.get(key);
+};
+const context = vm.createContext({document: {querySelector: node}, localStorage: {getItem: () => null}, window: {scrollTo() {}}, clearInterval() {}, setInterval() {}, setTimeout() {}, scrollY: 0, console});
+vm.runInContext(fs.readFileSync('dist/app.js', 'utf8'), context);
+const run = code => vm.runInContext(code, context);
+const titles = ['Cada carga.', 'Centro de', 'Nueva operación', 'El vehículo', 'Configura', 'Analizando las', 'Rutas', 'Ruta lista'];
+titles.forEach((title, i) => {
+  run(`go(${i})`);
+  assert.ok(node('#app').innerHTML.includes(title), `Pantalla ${i + 1}`);
+  assert.equal((node('#app').innerHTML.match(/src="assets\/images\/logo-smart-route.png"/g) || []).length, 1, `Logo oficial en pantalla ${i + 1}`);
+});
+run("values.name='Operación conservada';go(3);go(2)");
+assert.ok(node('#app').innerHTML.includes('Operación conservada'));
+assert.equal(run('validCargo()'), true);
+run('values.weight=6000');
+assert.equal(run('validCargo()'), false);
+run("values.weight=4800;selected='B';go(6)");
+assert.match(node('#app').innerHTML, /confirmRoute\(\)" disabled/);
+run("selected='A';go(7);startRoute()");
+assert.ok(node('#app').innerHTML.includes('● En ruta'));
+assert.equal(run('routes.A.margin'), '1 h 24 min');
+assert.equal(run("Number(routes.B.cost.replace('.',''))-Number(routes.A.cost.replace('.',''))"), 5700);
+console.log('OK: ocho vistas, navegación, persistencia, validación de carga, restricción B, inicio y coherencia de datos.');
+run('profile()');
+assert.ok(node('#dialog-content').innerHTML.includes('assets/images/logo-smart-route.png'));
+assert.ok(!node('#dialog-content').innerHTML.includes('type="file"'));
+assert.deepEqual(fs.readFileSync('assets/images/logo-smart-route.png'), fs.readFileSync('dist/assets/images/logo-smart-route.png'));
+console.log('OK: logo oficial en las ocho vistas y Perfil; PNG distribuido idéntico al original.');
