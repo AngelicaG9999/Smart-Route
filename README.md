@@ -24,4 +24,4 @@ Rutas inteligentes, decisiones eficientes.
 
 ## Prototipo interactivo
 
-[Ver prototipo]
+[Ver prototipo]: https://angelicag9999.github.io/Smart-Route/
